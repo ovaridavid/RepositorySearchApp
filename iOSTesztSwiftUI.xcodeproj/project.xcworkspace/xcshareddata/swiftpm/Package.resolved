@@ -1,0 +1,15 @@
+{
+  "originHash" : "4ea237adc4fb8a4b1eb1527c5dbcd60c9fde8a4701e2e9030047349810559589",
+  "pins" : [
+    {
+      "identity" : "repositorysearchapi",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ovaridavid/RepositorySearchAPI",
+      "state" : {
+        "revision" : "aff3392230b5cae09a82fafe2352f8fa9075f8db",
+        "version" : "1.0.2"
+      }
+    }
+  ],
+  "version" : 3
+}
