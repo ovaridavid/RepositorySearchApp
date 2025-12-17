@@ -1,0 +1,1 @@
+SwiftUI-based iOS application that implements GitHub repository search using Swift Concurrency (async/await), MVVM architecture, dependency injection, and a modular networking layer extracted into a separate Swift Package (SPM).
