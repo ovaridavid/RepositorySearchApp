@@ -5,8 +5,8 @@
 //  Created by Óvári Dávid on 2025. 12. 16..
 //
 
+import SwiftUI
 import RepositorySearchAPI
-import Observation
 
 @MainActor
 @Observable
@@ -18,22 +18,23 @@ final class RepositoryListViewModel {
         case empty
     }
 
-    var state: State = .loaded([])
-
+    private(set) var state: State = .loading
     private let apiClient: RepositorySearchAPIClientProtocol
+    private let query: String
 
-    init(apiClient: RepositorySearchAPIClientProtocol) {
+    init(apiClient: RepositorySearchAPIClientProtocol, query: String) {
         self.apiClient = apiClient
+        self.query = query
     }
 
-    func load(query: String) async {
+    func loadRepositories() async {
+        if case .loaded = state { return }
+
         state = .loading
 
         do {
             let apiRepositories = try await apiClient.searchRepositories(query: query)
-            let domainRepositories = apiRepositories.map { (repository: Repository) in
-                RepositoryApiToDomainMapper.map(data: repository)
-            }
+            let domainRepositories = apiRepositories.map { RepositoryApiToDomainMapper.map(data: $0) }
 
             if domainRepositories.isEmpty {
                 state = .empty
@@ -41,9 +42,7 @@ final class RepositoryListViewModel {
                 state = .loaded(domainRepositories)
             }
         } catch {
-            state = .error(
-                RepositoryErrorMapper.map(error)
-            )
+            state = .error(RepositoryErrorMapper.map(error))
         }
     }
 }

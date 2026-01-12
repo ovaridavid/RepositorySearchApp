@@ -6,24 +6,18 @@
 //
 
 import SwiftUI
-import RepositorySearchAPI
 
 struct SearchView: View {
-    @State private var query: String = ""
-    @State private var viewModel: RepositoryListViewModel
-
-    init(apiClient: RepositorySearchAPIClientProtocol) {
-        _viewModel = State(
-            wrappedValue: RepositoryListViewModel(apiClient: apiClient)
-        )
-    }
+    @State var viewModel: SearchViewModel
+    let factory: ViewModelFactory
 
     var body: some View {
         NavigationStack {
             ZStack {
                 Color(.systemBackground).ignoresSafeArea()
                 VStack(alignment: .leading, spacing: Constants.verticalLargeSpacing) {
-                    TextField("What are you looking for?", text: $query)
+                    @Bindable var vm = viewModel
+                    TextField("What are you looking for?", text: $vm.query)
                         .autocorrectionDisabled()
                         .padding(.horizontal)
                         .padding(.vertical, Constants.verticalMediunSpacing)
@@ -38,9 +32,10 @@ struct SearchView: View {
 
                 VStack {
                     Spacer()
-
                     NavigationLink {
-                        RepositoryListView(viewModel: viewModel)
+                        RepositoryListView(
+                            viewModel: factory.makeRepositoryListViewModel(for: viewModel.query)
+                        )
                     } label: {
                         Text("Search")
                             .font(.headline)
@@ -49,20 +44,10 @@ struct SearchView: View {
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: Constants.verticalMediunSpacing)
-                                    .fill(Color(.systemBlue))
+                                    .fill(viewModel.isSearchEnabled ? Color(.systemBlue) : Color.gray)
                             )
                     }
-                    .simultaneousGesture(
-                        TapGesture().onEnded {
-                            Task {
-                                await viewModel.load(query: query)
-                            }
-                        }
-                    )
-                    .disabled(query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    .opacity(
-                        query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.5 : 1.0
-                    )
+                    .disabled(!viewModel.isSearchEnabled)
                     .padding(.horizontal)
                     .padding(.bottom, Constants.verticalMediunSpacing)
                 }
@@ -79,7 +64,7 @@ private extension SearchView {
         static let verticalMediunSpacing: CGFloat = 16.0
         static let verticalLargeSpacing: CGFloat = 20.0
         static let cornerRadius: CGFloat = 12.0
-        static let lineWidth: CGFloat = 2
+        static let lineWidth: CGFloat = 2.0
         static let textfieldOpacity: CGFloat = 0.5
     }
 }

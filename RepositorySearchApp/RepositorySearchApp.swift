@@ -6,19 +6,14 @@
 //
 
 import SwiftUI
-import RepositorySearchAPI
 
 @main
 struct RepositorySearchApp: App {
-    private let apiClient: RepositorySearchAPIClientProtocol
-
-    init() {
-        self.apiClient = RepositorySearchAPIClient()
-    }
+    private let container = AppContainer()
 
     var body: some Scene {
         WindowGroup {
-            SearchView(apiClient: apiClient)
+            SearchView(viewModel: container.makeSearchViewModel(), factory: container)
         }
     }
 }

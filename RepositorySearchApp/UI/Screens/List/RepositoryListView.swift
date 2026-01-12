@@ -8,21 +8,19 @@
 import SwiftUI
 
 struct RepositoryListView: View {
-    @State private var viewModel: RepositoryListViewModel
-
-    init(viewModel: RepositoryListViewModel) {
-        _viewModel = State(wrappedValue: viewModel)
-    }
+    @State var viewModel: RepositoryListViewModel
 
     var body: some View {
         content
             .navigationTitle("Repositories")
+            .task {
+                await viewModel.loadRepositories()
+            }
     }
 
     @ViewBuilder
     private var content: some View {
         switch viewModel.state {
-
         case .loading:
             ProgressView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -37,14 +35,23 @@ struct RepositoryListView: View {
             }
 
         case .error(let message):
-            Text(message)
-                .foregroundColor(.red)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            VStack {
+                Image(systemName: "exclamationmark.triangle")
+                    .font(.largeTitle)
+                Text(message)
+                    .multilineTextAlignment(.center)
+            }
+            .foregroundColor(.red)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding()
 
         case .empty:
-            Text("Nothing to see here ☹️")
-                .foregroundColor(.black)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            VStack {
+                Text("Nothing to see here ☹️")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }

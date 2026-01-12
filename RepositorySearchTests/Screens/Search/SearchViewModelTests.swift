@@ -52,19 +52,4 @@ struct SearchViewModelTests {
         // THEN
         #expect(isEnabled == true)
     }
-
-    @Test
-    func givenSearchTapped_thenNavigateToListBecomesTrue() {
-
-        // GIVEN
-        let viewModel = SearchViewModel()
-        #expect(viewModel.navigateToList == false)
-
-        // WHEN
-        viewModel.searchTapped()
-
-        // THEN
-        #expect(viewModel.navigateToList == true)
-    }
 }
-
